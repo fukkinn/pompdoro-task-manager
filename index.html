@@ -5,43 +5,25 @@
 <title>ToDo + ポモドーロ</title>
 <style>
 
-/* ===== CSS 変数（ライトモード） ===== */
+/* ===== 変数（ライトテーマ） ===== */
 
 :root{
 
-  --bg-main:#fdf6e3;
+  --bg-main:#fdf6e3; --card-bg:#fff; --card-shadow:0 4px 12px rgba(0,0,0,.1);
 
-  --card-bg:#fff;
+  --txt-main:#2a2a2a; --txt-muted:#666; --accent:#268bd2;
 
-  --card-shadow:0 4px 12px rgba(0,0,0,.1);
-
-  --txt-main:#2a2a2a;
-
-  --txt-muted:#666;
-
-  --accent:#268bd2;
-
-  --priority-low:#2aa198;      /* 低 = グリーン */
-
-  --priority-medium:#ff9800;   /* 中 = オレンジ */
-
-  --priority-high:#dc322f;     /* 高 = レッド */
+  --prio-low:#2aa198; --prio-mid:#ff9800; --prio-hi:#dc322f;
 
 }
 
-/* ===== ダークモードで上書き ===== */
+/* ===== ダーク ===== */
 
 body.dark{
 
-  --bg-main:#1e1e1e;
+  --bg-main:#1e1e1e; --card-bg:#2c2c2c; --card-shadow:0 4px 12px rgba(0,0,0,.6);
 
-  --card-bg:#2c2c2c;
-
-  --card-shadow:0 4px 12px rgba(0,0,0,.6);
-
-  --txt-main:#eaeaea;
-
-  --txt-muted:#aaa;
+  --txt-main:#eaeaea; --txt-muted:#aaa;
 
 }
 
@@ -49,49 +31,21 @@ body.dark{
 
 body{
 
-  margin:0;padding:2rem;
+  margin:0;padding:2rem;font:16px/1.5 "Helvetica Neue",sans-serif;
 
-  font:16px/1.5 "Helvetica Neue",sans-serif;
-
-  background:var(--bg-main);color:var(--txt-main);
-
-  transition:background-color .2s,color .2s;
+  background:var(--bg-main);color:var(--txt-main);transition:.2s;
 
 }
 
-h1{
+h1{margin:0 0 1rem;text-align:center;font-size:clamp(1.8rem,3vw,2.4rem);display:flex;justify-content:center;gap:.8rem;}
 
-  margin:0 0 1rem;text-align:center;
+#theme-toggle{font-size:1.2rem;padding:.3rem .6rem;border:none;border-radius:4px;cursor:pointer;background:var(--accent);color:#fff;}
 
-  font-size:clamp(1.8rem,3vw,2.4rem);
+section{background:var(--card-bg);border-radius:8px;padding:1.5rem;box-shadow:var(--card-shadow);}
 
-  display:flex;justify-content:center;align-items:center;gap:.8rem;
+.container{display:grid;gap:1.5rem;}@media(min-width:750px){.container{grid-template-columns:1fr 1fr;}}
 
-}
-
-#theme-toggle{
-
-  font-size:1.2rem;padding:.3rem .6rem;border:none;border-radius:4px;
-
-  cursor:pointer;background:var(--accent);color:#fff;
-
-}
-
-section{
-
-  background:var(--card-bg);border-radius:8px;
-
-  padding:1.5rem;box-shadow:var(--card-shadow);
-
-}
-
-.container{display:grid;gap:1.5rem;}
-
-@media(min-width:750px){.container{grid-template-columns:1fr 1fr;}}
-
-/* ===== 共通入力 ===== */
-
-input[type="text"],input[type="number"],select,button{
+input[type="text"],input[type="number"],input[type="date"],select,button{
 
   padding:.5rem .75rem;border:1px solid #ccc;border-radius:4px;font-size:1rem;
 
@@ -101,45 +55,41 @@ button{cursor:pointer;background:var(--accent);color:#fff;border:none;transition
 
 button:hover{filter:brightness(.9);}button:disabled{opacity:.5;cursor:not-allowed;}
 
-/* ===== ToDo UI ===== */
-
 ul{list-style:none;margin:.5rem 0 0;padding:0;}
 
 li{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eee;padding:.6rem 0;}
 
-body.dark li{border-bottom:1px solid #444;}
+body.dark li{border-bottom:1px solid #444;}li:last-child{border-bottom:none;}
 
-li:last-child{border-bottom:none;}
+.task{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
 
-.task{display:flex;align-items:center;gap:.6rem;cursor:default;}
+.priority-dot{width:.8rem;height:.8rem;border-radius:50%;}
 
-.priority-dot{
-
-  width:.8rem;height:.8rem;border-radius:50%;flex:0 0 .8rem;
-
-}
-
-.priority-low{background:var(--priority-low);}
-
-.priority-medium{background:var(--priority-medium);}
-
-.priority-high{background:var(--priority-high);}
+.priority-low{background:var(--prio-low);} .priority-mid{background:var(--prio-mid);} .priority-hi{background:var(--prio-hi);}
 
 .priority-label{font-size:.85rem;font-weight:bold;}
 
-.priority-low  + .priority-label{color:var(--priority-low);}
+.priority-low  + .priority-label{color:var(--prio-low);}
 
-.priority-medium+ .priority-label{color:var(--priority-medium);}
+.priority-mid  + .priority-label{color:var(--prio-mid);}
 
-.priority-high + .priority-label{color:var(--priority-high);}
+.priority-hi   + .priority-label{color:var(--prio-hi);}
 
-.completed .text{ text-decoration:line-through; }      /* ← 色は変えない */
+.date-label{font-size:.8rem;color:var(--txt-muted);}
 
-.priority-dot:hover{outline:2px dashed #999;outline-offset:2px;}
+.completed .text{text-decoration:line-through;}
 
 .filter-group{margin-top:.8rem;display:flex;gap:.4rem;}
 
-/* ===== Timer UI ===== */
+.sort-wrapper{margin-top:.8rem;position:relative;display:inline-block;}
+
+#sort-menu{position:absolute;top:110%;right:0;background:var(--card-bg);border:1px solid #ccc;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.2);display:none;z-index:10;}
+
+#sort-menu button{display:block;width:100%;text-align:left;padding:.5rem 1rem;background:none;color:var(--txt-main);}
+
+#sort-menu button:hover{background:rgba(0,0,0,.05);}
+
+body.dark #sort-menu button:hover{background:rgba(255,255,255,.05);}
 
 #timer-display{font-size:clamp(2.5rem,5vw,3.2rem);margin:.5rem 0;}
 
@@ -151,35 +101,22 @@ body.dark #progress-wrap{background:#444;}
 
 .time-inputs{display:flex;justify-content:center;gap:.6rem;margin-bottom:.8rem;}
 
-/* ===== Flash animation ===== */
-
-@keyframes flashBlink{
-
-  0%,100%{background-color:var(--bg-main);}
-
-  50%    {background-color:#fffacd;}
-
-}
+@keyframes flashBlink{0%,100%{background:var(--bg-main);}50%{background:#fffacd;}}
 
 body.flash{animation:flashBlink .4s ease-in-out 3;}
 </style>
 </head>
 <body>
-<h1>
-
-  ToDo + ポモドーロ
-<button id="theme-toggle" title="テーマ切替">🌙</button>
-</h1>
+<h1>ToDo + ポモドーロ <button id="theme-toggle" title="テーマ切替">🌙</button></h1>
 <div class="container">
 <!-- ===== ToDo ===== -->
 <section id="todo-card">
 <h2>📝 ToDoリスト</h2>
-<div>
-<input type="text" id="todo-input" placeholder="やることを入力..." />
-<select id="priority-select">
-<option value="low">低</option>
-<option value="medium" selected>中</option>
-<option value="high">高</option>
+<div style="display:flex;flex-wrap:wrap;gap:.5rem">
+<input type="text"  id="todo-input"  placeholder="やること..." style="flex:1 1 160px;">
+<input type="date"  id="date-input"  style="flex:0 0 150px;">
+<select            id="priority-select">
+<option value="low">低</option><option value="mid" selected>中</option><option value="hi">高</option>
 </select>
 <button id="add-btn">追加</button>
 </div>
@@ -187,6 +124,14 @@ body.flash{animation:flashBlink .4s ease-in-out 3;}
 <button data-filter="all">すべて</button>
 <button data-filter="active">未完了</button>
 <button data-filter="done">完了</button>
+<div class="sort-wrapper">
+<button id="sort-btn">並び替え ▼</button>
+<div id="sort-menu">
+<button data-sort="prio">優先度（高→低）</button>
+<button data-sort="due">締切が近い順</button>
+<button data-sort="orig">登録順に戻す</button>
+</div>
+</div>
 </div>
 <ul id="todo-list"></ul>
 </section>
@@ -206,118 +151,180 @@ body.flash{animation:flashBlink .4s ease-in-out 3;}
 </div>
 <script>
 
-/* ========== テーマ切替 ========== */
+/* ===== テーマ切替 ===== */
 
-const bodyEl = document.body;
+const bodyEl = document.body; const themeBtn = document.getElementById("theme-toggle");
 
-const themeBtn = document.getElementById("theme-toggle");
+if(localStorage.getItem("theme")==="dark"){bodyEl.classList.add("dark");themeBtn.textContent="☀️";}
 
-const savedTheme = localStorage.getItem("theme") || "light";
+themeBtn.onclick = ()=>{bodyEl.classList.toggle("dark");
 
-if(savedTheme==="dark"){bodyEl.classList.add("dark");themeBtn.textContent="☀️";}
+  const mode = bodyEl.classList.contains("dark")?"dark":"light";
 
-themeBtn.onclick = ()=>{
+  themeBtn.textContent = mode==="dark"?"☀️":"🌙";
 
-  bodyEl.classList.toggle("dark");
-
-  const now = bodyEl.classList.contains("dark")?"dark":"light";
-
-  themeBtn.textContent = now==="dark"?"☀️":"🌙";
-
-  localStorage.setItem("theme",now);
+  localStorage.setItem("theme",mode);
 
 };
 
-/* ========== ToDo ========== */
+/* ===== ToDo ===== */
 
-let todos = JSON.parse(localStorage.getItem("todos")||"[]");
+let todos = JSON.parse(localStorage.getItem("todos")||"[]");   // {text,prio,done,due,created}
 
 let currentFilter = localStorage.getItem("filter")||"all";
 
+let sortMode = "orig";                                         // orig | prio | due
+
 const todoInput   = document.getElementById("todo-input");
 
-const prioritySel = document.getElementById("priority-select");
+const dateInput   = document.getElementById("date-input");
+
+const prioSel     = document.getElementById("priority-select");
 
 const listEl      = document.getElementById("todo-list");
 
 document.getElementById("add-btn").onclick = addTodo;
 
-document.querySelectorAll(".filter-group button").forEach(btn=>{
+document.querySelectorAll(".filter-group button[data-filter]").forEach(btn=>btn.onclick=()=>{currentFilter=btn.dataset.filter;localStorage.setItem("filter",currentFilter);render();});
 
-  btn.onclick = ()=>{currentFilter=btn.dataset.filter;localStorage.setItem("filter",currentFilter);render();}
+/* --- ソートメニュー --- */
 
-});
+const sortBtn=document.getElementById("sort-btn"),sortMenu=document.getElementById("sort-menu");
+
+sortBtn.onclick = ()=>{sortMenu.style.display = sortMenu.style.display?"":"block";}
+
+sortMenu.onclick = e=>{
+
+  if(e.target.dataset.sort){sortMode=e.target.dataset.sort;sortMenu.style.display="none";render();}
+
+};
+
+document.addEventListener("click",e=>{if(!sortBtn.contains(e.target)&&!sortMenu.contains(e.target))sortMenu.style.display="none";});
 
 function addTodo(){
 
-  const text = todoInput.value.trim();
+  const text=todoInput.value.trim(),due=dateInput.value;
 
   if(!text) return;
 
-  todos.push({text,priority:prioritySel.value,done:false});
+  todos.push({text,prio:prioSel.value,done:false,due,created:Date.now()});
 
-  todoInput.value="";save();render();
-
-}
-
-function toggle(idx){todos[idx].done=!todos[idx].done;save();render();}
-
-function del(idx){todos.splice(idx,1);save();render();}
-
-function editText(idx,span){
-
-  const val=todos[idx].text;
-
-  const input=document.createElement("input");
-
-  input.value=val;
-
-  input.onblur=()=>{todos[idx].text=input.value.trim()||val;save();render();}
-
-  span.replaceWith(input);input.focus();
+  todoInput.value="";dateInput.value="";save();render();
 
 }
 
-function cyclePriority(p){return p==="low"?"medium":p==="medium"?"high":"low";}
+function toggle(i){todos[i].done=!todos[i].done;save();render();}
 
-function changePrio(idx){todos[idx].priority=cyclePriority(todos[idx].priority);save();render();}
+function move(i,dir){           // dir = -1 or +1
+
+  const j=i+dir;if(j<0||j>=todos.length)return;
+
+  [todos[i],todos[j]]=[todos[j],todos[i]];save();render();
+
+}
+
+function del(i){todos.splice(i,1);save();render();}
+
+function editText(i,span){
+
+  const inp=document.createElement("input");inp.value=todos[i].text;
+
+  inp.onblur=()=>{todos[i].text=inp.value.trim()||todos[i].text;save();render();};
+
+  span.replaceWith(inp);inp.focus();
+
+}
+
+function cyclePrio(p){return p==="low"?"mid":p==="mid"?"hi":"low";}
+
+function changePrio(i){todos[i].prio=cyclePrio(todos[i].prio);save();render();}
+
+function editDue(i,span){
+
+  const inp=document.createElement("input");inp.type="date";inp.value=todos[i].due;
+
+  inp.onblur=()=>{todos[i].due=inp.value;save();render();};
+
+  span.replaceWith(inp);inp.focus();
+
+}
+
+function sortTodos(arr){
+
+  if(sortMode==="prio"){
+
+    const rank={hi:0,mid:1,low:2};
+
+    arr.sort((a,b)=>rank[a.prio]-rank[b.prio]||a.created-b.created);
+
+  }else if(sortMode==="due"){
+
+    arr.sort((a,b)=>{
+
+      if(a.due&&b.due) return a.due.localeCompare(b.due);
+
+      if(a.due) return -1; if(b.due) return 1;
+
+      return a.created-b.created;
+
+    });
+
+  }else{ arr.sort((a,b)=>a.created-b.created);} // orig
+
+}
 
 function render(){
 
   listEl.innerHTML="";
 
-  todos
+  const view = todos.filter(t=>currentFilter==="all"||t.done===(currentFilter==="done"));
 
-    .filter(t=>currentFilter==="all"||t.done=== (currentFilter==="done"))
+  sortTodos(view);
 
-    .forEach((t,i)=>{
+  view.forEach((t,idxInView)=>{
 
-      const li=document.createElement("li");
+    const i=todos.indexOf(t); // 元配列 index
 
-      if(t.done) li.classList.add("completed");
+    const li=document.createElement("li");if(t.done)li.classList.add("completed");
 
-      const prioLabel = t.priority==="low"?"低":t.priority==="medium"?"中":"高";
+    const prioLabel=t.prio==="low"?"低":t.prio==="mid"?"中":"高";
 
-      li.innerHTML=`
+    li.innerHTML=`
 <div class="task">
 <input type="checkbox" ${t.done?"checked":""}/>
-<span class="priority-dot priority-${t.priority}" title="クリックで変更"></span>
+<span class="priority-dot priority-${t.prio}" title="クリックで変更"></span>
 <span class="priority-label">${prioLabel}</span>
 <span class="text">${t.text}</span>
+
+        ${t.due?`<span class="date-label">(〆 ${t.due})</span>`:""}
 </div>
-<button>削除</button>`;
+<div style="display:flex;gap:.3rem">
+<button title="上へ">⬆️</button>
+<button title="下へ">⬇️</button>
+<button>削除</button>
+</div>`;
 
-      li.querySelector("input").onclick=()=>toggle(i);
+    const chk=li.querySelector("input");
 
-      li.querySelector("button").onclick=()=>del(i);
+    chk.onclick=()=>toggle(i);
 
-      li.querySelector(".priority-dot").onclick=()=>changePrio(i);
+    li.querySelector(".priority-dot").onclick=()=>changePrio(i);
 
-      li.querySelector(".text").ondblclick=()=>editText(i,li.querySelector(".text"));
+    const txtSpan=li.querySelector(".text");txtSpan.ondblclick=()=>editText(i,txtSpan);
 
-      listEl.appendChild(li);
+    const dateSpan=li.querySelector(".date-label");if(dateSpan)dateSpan.ondblclick=()=>editDue(i,dateSpan);
 
-    });
+    const buttons=li.querySelectorAll("button");
+
+    buttons[0].onclick=()=>move(i,-1); // up
+
+    buttons[1].onclick=()=>move(i,+1); // down
+
+    buttons[2].onclick=()=>del(i);     // delete
+
+    listEl.appendChild(li);
+
+  });
 
 }
 
@@ -325,61 +332,29 @@ function save(){localStorage.setItem("todos",JSON.stringify(todos));}
 
 render();
 
-/* ========== タイマー ========== */
+/* ===== タイマー ===== */
 
-const workInput  = document.getElementById("work-min");
+const workInput=document.getElementById("work-min"),breakInput=document.getElementById("break-min");
 
-const breakInput = document.getElementById("break-min");
-
-const display    = document.getElementById("timer-display");
-
-const progress   = document.getElementById("progress-bar");
+const display=document.getElementById("timer-display"),progress=document.getElementById("progress-bar");
 
 let isWork=true,timer=null,totalSec=1500,leftSec=1500;
 
-function updateDisplay(){
+function updateDisp(){const m=String(Math.floor(leftSec/60)).padStart(2,"0"),s=String(leftSec%60).padStart(2,"0");
 
-  const m=String(Math.floor(leftSec/60)).padStart(2,"0");
+  display.textContent=`${m}:${s}`;progress.style.width=`${(1-leftSec/totalSec)*100}%`;}
 
-  const s=String(leftSec%60).padStart(2,"0");
+function flash(){bodyEl.classList.add("flash");setTimeout(()=>bodyEl.classList.remove("flash"),1200);}
 
-  display.textContent=`${m}:${s}`;
-
-  progress.style.width=`${(1-leftSec/totalSec)*100}%`;
-
-}
-
-function flashScreen(){
-
-  bodyEl.classList.add("flash");
-
-  setTimeout(()=>bodyEl.classList.remove("flash"),1200);
-
-}
-
-function start(){ if(timer) return;
-
-  timer=setInterval(()=>{leftSec--;updateDisplay();if(leftSec<=0) switchMode();},1000);
-
-}
+function start(){if(timer)return;timer=setInterval(()=>{leftSec--;updateDisp();if(leftSec<=0)switchMode();},1000);}
 
 function pause(){clearInterval(timer);timer=null;}
 
-function reset(){pause();isWork=true;totalSec=leftSec=workInput.value*60;updateDisplay();}
+function reset(){pause();isWork=true;totalSec=leftSec=workInput.value*60;updateDisp();}
 
-function switchMode(){
+function switchMode(){pause();flash();isWork=!isWork;totalSec=leftSec=(isWork?workInput.value:breakInput.value)*60;
 
-  pause();flashScreen();
-
-  isWork=!isWork;
-
-  totalSec=leftSec=(isWork?workInput.value:breakInput.value)*60;
-
-  alert(isWork?"作業時間です！":"休憩しましょう！");
-
-  updateDisplay();start();
-
-}
+  alert(isWork?"作業時間です！":"休憩しましょう！");updateDisp();start();}
 
 document.getElementById("start-btn").onclick=start;
 
@@ -389,7 +364,7 @@ document.getElementById("reset-btn").onclick=reset;
 
 workInput.onchange=breakInput.onchange=reset;
 
-reset(); /* 初期化 */
+reset();
 </script>
 </body>
 </html>
