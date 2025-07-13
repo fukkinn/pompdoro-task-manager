@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>ToDo & ポモドーロタイマー</title>
+  <title>ToDo + ポモドーロ</title>
   <style>
     body {
       font-family: sans-serif;
@@ -46,6 +46,7 @@
       padding: 8px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
       border-bottom: 1px solid #eee;
     }
 
@@ -57,6 +58,12 @@
     #timer-display {
       font-size: 48px;
       margin: 20px 0;
+    }
+
+    span.task-text {
+      flex-grow: 1;
+      text-align: left;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -80,28 +87,67 @@
   </div>
 
   <script>
-    // ToDoリストの処理
+    let todos = [];
+
+    function saveTodos() {
+      localStorage.setItem("todos", JSON.stringify(todos));
+    }
+
+    function loadTodos() {
+      const stored = localStorage.getItem("todos");
+      if (stored) {
+        todos = JSON.parse(stored);
+        renderTodos();
+      }
+    }
+
     function addTodo() {
       const input = document.getElementById('todo-input');
       const text = input.value.trim();
       if (text === '') return;
 
-      const li = document.createElement('li');
-      li.innerHTML = `
-        <span onclick="toggleComplete(this)">${text}</span>
-        <button onclick="this.parentElement.remove()">削除</button>
-      `;
-      document.getElementById('todo-list').appendChild(li);
+      todos.push({ text: text, completed: false });
       input.value = '';
+      saveTodos();
+      renderTodos();
     }
 
-    function toggleComplete(el) {
-      el.classList.toggle('completed');
+    function toggleComplete(index) {
+      todos[index].completed = !todos[index].completed;
+      saveTodos();
+      renderTodos();
     }
 
-    // タイマーの処理
-    let isWorkTime = true; // 作業 or 休憩
-    let timeLeft = 25 * 60; // 秒数
+    function deleteTodo(index) {
+      todos.splice(index, 1);
+      saveTodos();
+      renderTodos();
+    }
+
+    function renderTodos() {
+      const list = document.getElementById('todo-list');
+      list.innerHTML = '';
+      todos.forEach((todo, index) => {
+        const li = document.createElement('li');
+        const span = document.createElement('span');
+        span.textContent = todo.text;
+        span.className = 'task-text';
+        if (todo.completed) span.classList.add('completed');
+        span.onclick = () => toggleComplete(index);
+
+        const del = document.createElement('button');
+        del.textContent = '削除';
+        del.onclick = () => deleteTodo(index);
+
+        li.appendChild(span);
+        li.appendChild(del);
+        list.appendChild(li);
+      });
+    }
+
+    // タイマー機能
+    let isWorkTime = true;
+    let timeLeft = 25 * 60;
     let timerId = null;
 
     function updateDisplay() {
@@ -111,7 +157,7 @@
     }
 
     function startTimer() {
-      if (timerId) return; // すでに動いてる
+      if (timerId) return;
       timerId = setInterval(() => {
         timeLeft--;
         updateDisplay();
@@ -141,8 +187,9 @@
       updateDisplay();
     }
 
-    // 初期表示
+    // 初期化
     updateDisplay();
+    loadTodos();
   </script>
 
 </body>
