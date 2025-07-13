@@ -4,61 +4,172 @@
 <meta charset="UTF-8">
 <title>ToDo + ポモドーロ</title>
 <style>
-/* ===== カラーパレット & ベース ===== */
+
+/* ===== CSS 変数（ライトモード） ===== */
+
 :root{
- --bg-main:#fdf6e3;
- --card-bg:#fff;
- --card-shadow:0 4px 12px rgba(0,0,0,.1);
- --txt-main:#2a2a2a;
- --txt-muted:#666;
- --accent:#268bd2;
- --priority-low:#2aa198;      /* 🟢 */
- --priority-medium:#cb4b16;   /* 🟠 */
- --priority-high:#dc322f;     /* 🔴 */
+
+  --bg-main:#fdf6e3;
+
+  --card-bg:#fff;
+
+  --card-shadow:0 4px 12px rgba(0,0,0,.1);
+
+  --txt-main:#2a2a2a;
+
+  --txt-muted:#666;
+
+  --accent:#268bd2;
+
+  --priority-low:#2aa198;      /* 低 = グリーン */
+
+  --priority-medium:#ff9800;   /* 中 = オレンジ */
+
+  --priority-high:#dc322f;     /* 高 = レッド */
+
 }
+
+/* ===== ダークモードで上書き ===== */
+
+body.dark{
+
+  --bg-main:#1e1e1e;
+
+  --card-bg:#2c2c2c;
+
+  --card-shadow:0 4px 12px rgba(0,0,0,.6);
+
+  --txt-main:#eaeaea;
+
+  --txt-muted:#aaa;
+
+}
+
 *{box-sizing:border-box;}
+
 body{
- margin:0;padding:2rem;
- font:16px/1.5 "Helvetica Neue",sans-serif;
- color:var(--txt-main);background:var(--bg-main);
- transition:background-color .2s;
+
+  margin:0;padding:2rem;
+
+  font:16px/1.5 "Helvetica Neue",sans-serif;
+
+  background:var(--bg-main);color:var(--txt-main);
+
+  transition:background-color .2s,color .2s;
+
 }
-h1{margin:0 0 1rem;text-align:center;font-size:clamp(1.8rem,3vw,2.4rem);}
-section{background:var(--card-bg);border-radius:8px;padding:1.5rem;box-shadow:var(--card-shadow);}
+
+h1{
+
+  margin:0 0 1rem;text-align:center;
+
+  font-size:clamp(1.8rem,3vw,2.4rem);
+
+  display:flex;justify-content:center;align-items:center;gap:.8rem;
+
+}
+
+#theme-toggle{
+
+  font-size:1.2rem;padding:.3rem .6rem;border:none;border-radius:4px;
+
+  cursor:pointer;background:var(--accent);color:#fff;
+
+}
+
+section{
+
+  background:var(--card-bg);border-radius:8px;
+
+  padding:1.5rem;box-shadow:var(--card-shadow);
+
+}
+
 .container{display:grid;gap:1.5rem;}
+
 @media(min-width:750px){.container{grid-template-columns:1fr 1fr;}}
+
 /* ===== 共通入力 ===== */
+
 input[type="text"],input[type="number"],select,button{
- padding:.5rem .75rem;border:1px solid #ccc;border-radius:4px;font-size:1rem;}
-button{cursor:pointer;background:var(--accent);color:#fff;border:none;transition:filter .2s;}
-button:hover{filter:brightness(.9);}button:disabled{opacity:.5;cursor:not-allowed;}
-/* ===== ToDo UI ===== */
-ul{list-style:none;margin:.5rem 0 0;padding:0;}
-li{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eee;padding:.6rem 0;}
-li:last-child{border-bottom:none;}
-.task{display:flex;align-items:center;gap:.6rem;cursor:default;}
-.priority-dot{width:.8rem;height:.8rem;border-radius:50%;flex:0 0 .8rem;}
-.priority-low{background:var(--priority-low);}
-.priority-medium{background:var(--priority-medium);}
-.priority-high{background:var(--priority-high);}
-.completed .text{text-decoration:line-through;color:var(--txt-muted);}
-.priority-dot:hover{outline:2px dashed #999;outline-offset:2px;}
-.filter-group{margin-top:.8rem;display:flex;gap:.4rem;}
-/* ===== Timer UI ===== */
-#timer-display{font-size:clamp(2.5rem,5vw,3.2rem);margin:.5rem 0;}
-#progress-wrap{width:100%;height:8px;background:#eee;border-radius:4px;overflow:hidden;margin-bottom:1rem;}
-#progress-bar{height:100%;width:0;background:var(--accent);transition:width 1s linear;}
-.time-inputs{display:flex;justify-content:center;gap:.6rem;margin-bottom:.8rem;}
-/* ===== Flash animation ===== */
-@keyframes flashBlink{
- 0%,100%{background-color:var(--bg-main);}
- 50%    {background-color:#fffacd;}
+
+  padding:.5rem .75rem;border:1px solid #ccc;border-radius:4px;font-size:1rem;
+
 }
+
+button{cursor:pointer;background:var(--accent);color:#fff;border:none;transition:filter .2s;}
+
+button:hover{filter:brightness(.9);}button:disabled{opacity:.5;cursor:not-allowed;}
+
+/* ===== ToDo UI ===== */
+
+ul{list-style:none;margin:.5rem 0 0;padding:0;}
+
+li{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eee;padding:.6rem 0;}
+
+body.dark li{border-bottom:1px solid #444;}
+
+li:last-child{border-bottom:none;}
+
+.task{display:flex;align-items:center;gap:.6rem;cursor:default;}
+
+.priority-dot{
+
+  width:.8rem;height:.8rem;border-radius:50%;flex:0 0 .8rem;
+
+}
+
+.priority-low{background:var(--priority-low);}
+
+.priority-medium{background:var(--priority-medium);}
+
+.priority-high{background:var(--priority-high);}
+
+.priority-label{font-size:.85rem;font-weight:bold;}
+
+.priority-low  + .priority-label{color:var(--priority-low);}
+
+.priority-medium+ .priority-label{color:var(--priority-medium);}
+
+.priority-high + .priority-label{color:var(--priority-high);}
+
+.completed .text{ text-decoration:line-through; }      /* ← 色は変えない */
+
+.priority-dot:hover{outline:2px dashed #999;outline-offset:2px;}
+
+.filter-group{margin-top:.8rem;display:flex;gap:.4rem;}
+
+/* ===== Timer UI ===== */
+
+#timer-display{font-size:clamp(2.5rem,5vw,3.2rem);margin:.5rem 0;}
+
+#progress-wrap{width:100%;height:8px;background:#eee;border-radius:4px;overflow:hidden;margin-bottom:1rem;}
+
+body.dark #progress-wrap{background:#444;}
+
+#progress-bar{height:100%;width:0;background:var(--accent);transition:width 1s linear;}
+
+.time-inputs{display:flex;justify-content:center;gap:.6rem;margin-bottom:.8rem;}
+
+/* ===== Flash animation ===== */
+
+@keyframes flashBlink{
+
+  0%,100%{background-color:var(--bg-main);}
+
+  50%    {background-color:#fffacd;}
+
+}
+
 body.flash{animation:flashBlink .4s ease-in-out 3;}
 </style>
 </head>
 <body>
-<h1>ToDo + ポモドーロ</h1>
+<h1>
+
+  ToDo + ポモドーロ
+<button id="theme-toggle" title="テーマ切替">🌙</button>
+</h1>
 <div class="container">
 <!-- ===== ToDo ===== -->
 <section id="todo-card">
@@ -94,97 +205,192 @@ body.flash{animation:flashBlink .4s ease-in-out 3;}
 </section>
 </div>
 <script>
-/* ========== ToDo ロジック ========== */
+
+/* ========== テーマ切替 ========== */
+
+const bodyEl = document.body;
+
+const themeBtn = document.getElementById("theme-toggle");
+
+const savedTheme = localStorage.getItem("theme") || "light";
+
+if(savedTheme==="dark"){bodyEl.classList.add("dark");themeBtn.textContent="☀️";}
+
+themeBtn.onclick = ()=>{
+
+  bodyEl.classList.toggle("dark");
+
+  const now = bodyEl.classList.contains("dark")?"dark":"light";
+
+  themeBtn.textContent = now==="dark"?"☀️":"🌙";
+
+  localStorage.setItem("theme",now);
+
+};
+
+/* ========== ToDo ========== */
+
 let todos = JSON.parse(localStorage.getItem("todos")||"[]");
+
 let currentFilter = localStorage.getItem("filter")||"all";
+
 const todoInput   = document.getElementById("todo-input");
+
 const prioritySel = document.getElementById("priority-select");
+
 const listEl      = document.getElementById("todo-list");
+
 document.getElementById("add-btn").onclick = addTodo;
+
 document.querySelectorAll(".filter-group button").forEach(btn=>{
- btn.onclick = ()=>{currentFilter=btn.dataset.filter;localStorage.setItem("filter",currentFilter);render();}
+
+  btn.onclick = ()=>{currentFilter=btn.dataset.filter;localStorage.setItem("filter",currentFilter);render();}
+
 });
+
 function addTodo(){
- const text = todoInput.value.trim();
- if(!text) return;
- todos.push({text,priority:prioritySel.value,done:false});
- todoInput.value="";save();render();
+
+  const text = todoInput.value.trim();
+
+  if(!text) return;
+
+  todos.push({text,priority:prioritySel.value,done:false});
+
+  todoInput.value="";save();render();
+
 }
+
 function toggle(idx){todos[idx].done=!todos[idx].done;save();render();}
+
 function del(idx){todos.splice(idx,1);save();render();}
+
 function editText(idx,span){
- const val=todos[idx].text;
- const input=document.createElement("input");
- input.value=val;
- input.onblur=()=>{todos[idx].text=input.value.trim()||val;save();render();}
- span.replaceWith(input);input.focus();
+
+  const val=todos[idx].text;
+
+  const input=document.createElement("input");
+
+  input.value=val;
+
+  input.onblur=()=>{todos[idx].text=input.value.trim()||val;save();render();}
+
+  span.replaceWith(input);input.focus();
+
 }
+
 function cyclePriority(p){return p==="low"?"medium":p==="medium"?"high":"low";}
+
 function changePrio(idx){todos[idx].priority=cyclePriority(todos[idx].priority);save();render();}
+
 function render(){
- listEl.innerHTML="";
- todos
-   .filter(t=>currentFilter==="all"||t.done=== (currentFilter==="done"))
-   .forEach((t,i)=>{
-     const li=document.createElement("li");
-     if(t.done) li.classList.add("completed");
-     li.innerHTML=`
+
+  listEl.innerHTML="";
+
+  todos
+
+    .filter(t=>currentFilter==="all"||t.done=== (currentFilter==="done"))
+
+    .forEach((t,i)=>{
+
+      const li=document.createElement("li");
+
+      if(t.done) li.classList.add("completed");
+
+      const prioLabel = t.priority==="low"?"低":t.priority==="medium"?"中":"高";
+
+      li.innerHTML=`
 <div class="task">
 <input type="checkbox" ${t.done?"checked":""}/>
 <span class="priority-dot priority-${t.priority}" title="クリックで変更"></span>
+<span class="priority-label">${prioLabel}</span>
 <span class="text">${t.text}</span>
 </div>
 <button>削除</button>`;
-     li.querySelector("input").onclick=()=>toggle(i);
-     li.querySelector("button").onclick=()=>del(i);
-     li.querySelector(".priority-dot").onclick=()=>changePrio(i);
-     li.querySelector(".text").ondblclick=()=>editText(i,li.querySelector(".text"));
-     listEl.appendChild(li);
-   });
+
+      li.querySelector("input").onclick=()=>toggle(i);
+
+      li.querySelector("button").onclick=()=>del(i);
+
+      li.querySelector(".priority-dot").onclick=()=>changePrio(i);
+
+      li.querySelector(".text").ondblclick=()=>editText(i,li.querySelector(".text"));
+
+      listEl.appendChild(li);
+
+    });
+
 }
+
 function save(){localStorage.setItem("todos",JSON.stringify(todos));}
+
 render();
-/* ========== タイマー ロジック ========== */
+
+/* ========== タイマー ========== */
+
 const workInput  = document.getElementById("work-min");
+
 const breakInput = document.getElementById("break-min");
+
 const display    = document.getElementById("timer-display");
+
 const progress   = document.getElementById("progress-bar");
-let isWork=true, timer=null, totalSec=1500, leftSec=1500;
+
+let isWork=true,timer=null,totalSec=1500,leftSec=1500;
+
 function updateDisplay(){
- const m=String(Math.floor(leftSec/60)).padStart(2,"0");
- const s=String(leftSec%60).padStart(2,"0");
- display.textContent=`${m}:${s}`;
- progress.style.width=`${(1-leftSec/totalSec)*100}%`;
+
+  const m=String(Math.floor(leftSec/60)).padStart(2,"0");
+
+  const s=String(leftSec%60).padStart(2,"0");
+
+  display.textContent=`${m}:${s}`;
+
+  progress.style.width=`${(1-leftSec/totalSec)*100}%`;
+
 }
+
 function flashScreen(){
- document.body.classList.add("flash");
- setTimeout(()=>document.body.classList.remove("flash"),1200);
+
+  bodyEl.classList.add("flash");
+
+  setTimeout(()=>bodyEl.classList.remove("flash"),1200);
+
 }
-function start(){
- if(timer) return;
- timer=setInterval(()=>{
-   leftSec--;updateDisplay();
-   if(leftSec<=0){switchMode();}
- },1000);
+
+function start(){ if(timer) return;
+
+  timer=setInterval(()=>{leftSec--;updateDisplay();if(leftSec<=0) switchMode();},1000);
+
 }
+
 function pause(){clearInterval(timer);timer=null;}
-function reset(){
- pause();isWork=true;
- totalSec=leftSec=workInput.value*60;updateDisplay();
-}
+
+function reset(){pause();isWork=true;totalSec=leftSec=workInput.value*60;updateDisplay();}
+
 function switchMode(){
- pause();
- flashScreen();                      // ★ 画面点滅
- isWork=!isWork;
- totalSec=leftSec=(isWork?workInput.value:breakInput.value)*60;
- alert(isWork?"作業時間です！":"休憩しましょう！");
- updateDisplay();start();
+
+  pause();flashScreen();
+
+  isWork=!isWork;
+
+  totalSec=leftSec=(isWork?workInput.value:breakInput.value)*60;
+
+  alert(isWork?"作業時間です！":"休憩しましょう！");
+
+  updateDisplay();start();
+
 }
+
 document.getElementById("start-btn").onclick=start;
+
 document.getElementById("pause-btn").onclick=pause;
+
 document.getElementById("reset-btn").onclick=reset;
+
 workInput.onchange=breakInput.onchange=reset;
+
 reset(); /* 初期化 */
 </script>
 </body>
 </html>
+ 
