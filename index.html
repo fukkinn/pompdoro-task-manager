@@ -1,225 +1,190 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <title>ToDo + ポモドーロ</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      background-color: #fdf6e3;
-      margin: 0;
-      padding: 30px;
-      text-align: center;
-    }
-
-    h1 {
-      color: #2a2a2a;
-    }
-
-    #todo-section, #timer-section {
-      background: #fff;
-      border-radius: 8px;
-      padding: 20px;
-      margin: 20px auto;
-      max-width: 600px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    input[type="text"], select {
-      padding: 8px;
-      font-size: 16px;
-      margin-right: 8px;
-    }
-
-    button {
-      padding: 8px 16px;
-      font-size: 14px;
-      margin: 5px;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    li {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid #eee;
-      padding: 10px;
-    }
-
-    .completed .task-text {
-      text-decoration: line-through;
-      color: gray;
-    }
-
-    .priority-low {
-      color: green;
-    }
-
-    .priority-medium {
-      color: orange;
-    }
-
-    .priority-high {
-      color: red;
-    }
-
-    #timer-display {
-      font-size: 48px;
-      margin: 20px 0;
-    }
-
-    .left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>ToDo + ポモドーロ</title>
+<style>
+/* ===== カラーパレット & ベース ===== */
+:root{
+ --bg-main:#fdf6e3;
+ --card-bg:#fff;
+ --card-shadow:0 4px 12px rgba(0,0,0,.1);
+ --txt-main:#2a2a2a;
+ --txt-muted:#666;
+ --accent:#268bd2;
+ --priority-low:#2aa198;      /* 🟢 */
+ --priority-medium:#cb4b16;   /* 🟠 */
+ --priority-high:#dc322f;     /* 🔴 */
+}
+*{box-sizing:border-box;}
+body{
+ margin:0;padding:2rem;
+ font:16px/1.5 "Helvetica Neue",sans-serif;
+ color:var(--txt-main);background:var(--bg-main);
+ transition:background-color .2s;
+}
+h1{margin:0 0 1rem;text-align:center;font-size:clamp(1.8rem,3vw,2.4rem);}
+section{background:var(--card-bg);border-radius:8px;padding:1.5rem;box-shadow:var(--card-shadow);}
+.container{display:grid;gap:1.5rem;}
+@media(min-width:750px){.container{grid-template-columns:1fr 1fr;}}
+/* ===== 共通入力 ===== */
+input[type="text"],input[type="number"],select,button{
+ padding:.5rem .75rem;border:1px solid #ccc;border-radius:4px;font-size:1rem;}
+button{cursor:pointer;background:var(--accent);color:#fff;border:none;transition:filter .2s;}
+button:hover{filter:brightness(.9);}button:disabled{opacity:.5;cursor:not-allowed;}
+/* ===== ToDo UI ===== */
+ul{list-style:none;margin:.5rem 0 0;padding:0;}
+li{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eee;padding:.6rem 0;}
+li:last-child{border-bottom:none;}
+.task{display:flex;align-items:center;gap:.6rem;cursor:default;}
+.priority-dot{width:.8rem;height:.8rem;border-radius:50%;flex:0 0 .8rem;}
+.priority-low{background:var(--priority-low);}
+.priority-medium{background:var(--priority-medium);}
+.priority-high{background:var(--priority-high);}
+.completed .text{text-decoration:line-through;color:var(--txt-muted);}
+.priority-dot:hover{outline:2px dashed #999;outline-offset:2px;}
+.filter-group{margin-top:.8rem;display:flex;gap:.4rem;}
+/* ===== Timer UI ===== */
+#timer-display{font-size:clamp(2.5rem,5vw,3.2rem);margin:.5rem 0;}
+#progress-wrap{width:100%;height:8px;background:#eee;border-radius:4px;overflow:hidden;margin-bottom:1rem;}
+#progress-bar{height:100%;width:0;background:var(--accent);transition:width 1s linear;}
+.time-inputs{display:flex;justify-content:center;gap:.6rem;margin-bottom:.8rem;}
+/* ===== Flash animation ===== */
+@keyframes flashBlink{
+ 0%,100%{background-color:var(--bg-main);}
+ 50%    {background-color:#fffacd;}
+}
+body.flash{animation:flashBlink .4s ease-in-out 3;}
+</style>
 </head>
 <body>
-
-  <h1>ToDo + ポモドーロ</h1>
-
-  <div id="todo-section">
-    <h2>📝 ToDoリスト</h2>
-    <input type="text" id="todo-input" placeholder="やることを入力..." />
-    <select id="priority-select">
-      <option value="low">低</option>
-      <option value="medium" selected>中</option>
-      <option value="high">高</option>
-    </select>
-    <button onclick="addTodo()">追加</button>
-    <ul id="todo-list"></ul>
-  </div>
-
-  <div id="timer-section">
-    <h2>⏱ ポモドーロタイマー</h2>
-    <div id="timer-display">25:00</div>
-    <button onclick="startTimer()">スタート</button>
-    <button onclick="pauseTimer()">一時停止</button>
-    <button onclick="resetTimer()">リセット</button>
-  </div>
-
-  <script>
-    let todos = [];
-
-    function saveTodos() {
-      localStorage.setItem("todos", JSON.stringify(todos));
-    }
-
-    function loadTodos() {
-      const stored = localStorage.getItem("todos");
-      if (stored) {
-        todos = JSON.parse(stored);
-        renderTodos();
-      }
-    }
-
-    function addTodo() {
-      const input = document.getElementById('todo-input');
-      const priority = document.getElementById('priority-select').value;
-      const text = input.value.trim();
-      if (text === '') return;
-
-      todos.push({ text: text, completed: false, priority: priority });
-      input.value = '';
-      saveTodos();
-      renderTodos();
-    }
-
-    function toggleComplete(index) {
-      todos[index].completed = !todos[index].completed;
-      saveTodos();
-      renderTodos();
-    }
-
-    function deleteTodo(index) {
-      todos.splice(index, 1);
-      saveTodos();
-      renderTodos();
-    }
-
-    function renderTodos() {
-      const list = document.getElementById('todo-list');
-      list.innerHTML = '';
-      todos.forEach((todo, index) => {
-        const li = document.createElement('li');
-        if (todo.completed) li.classList.add('completed');
-
-        const leftDiv = document.createElement('div');
-        leftDiv.className = 'left';
-
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.checked = todo.completed;
-        checkbox.onchange = () => toggleComplete(index);
-
-        const span = document.createElement('span');
-        span.textContent = todo.text;
-        span.className = `task-text priority-${todo.priority}`;
-
-        leftDiv.appendChild(checkbox);
-        leftDiv.appendChild(span);
-
-        const delBtn = document.createElement('button');
-        delBtn.textContent = '削除';
-        delBtn.onclick = () => deleteTodo(index);
-
-        li.appendChild(leftDiv);
-        li.appendChild(delBtn);
-        list.appendChild(li);
-      });
-    }
-
-    // タイマー
-    let isWorkTime = true;
-    let timeLeft = 25 * 60;
-    let timerId = null;
-
-    function updateDisplay() {
-      const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-      const seconds = (timeLeft % 60).toString().padStart(2, '0');
-      document.getElementById('timer-display').textContent = `${minutes}:${seconds}`;
-    }
-
-    function startTimer() {
-      if (timerId) return;
-      timerId = setInterval(() => {
-        timeLeft--;
-        updateDisplay();
-
-        if (timeLeft <= 0) {
-          clearInterval(timerId);
-          timerId = null;
-          isWorkTime = !isWorkTime;
-          timeLeft = isWorkTime ? 25 * 60 : 5 * 60;
-          alert(isWorkTime ? "作業時間です！" : "休憩しましょう！");
-          updateDisplay();
-          startTimer();
-        }
-      }, 1000);
-    }
-
-    function pauseTimer() {
-      clearInterval(timerId);
-      timerId = null;
-    }
-
-    function resetTimer() {
-      clearInterval(timerId);
-      timerId = null;
-      isWorkTime = true;
-      timeLeft = 25 * 60;
-      updateDisplay();
-    }
-
-    // 初期表示
-    updateDisplay();
-    loadTodos();
-  </script>
-
+<h1>ToDo + ポモドーロ</h1>
+<div class="container">
+<!-- ===== ToDo ===== -->
+<section id="todo-card">
+<h2>📝 ToDoリスト</h2>
+<div>
+<input type="text" id="todo-input" placeholder="やることを入力..." />
+<select id="priority-select">
+<option value="low">低</option>
+<option value="medium" selected>中</option>
+<option value="high">高</option>
+</select>
+<button id="add-btn">追加</button>
+</div>
+<div class="filter-group">
+<button data-filter="all">すべて</button>
+<button data-filter="active">未完了</button>
+<button data-filter="done">完了</button>
+</div>
+<ul id="todo-list"></ul>
+</section>
+<!-- ===== Timer ===== -->
+<section id="timer-card">
+<h2>⏱ ポモドーロタイマー</h2>
+<div class="time-inputs">
+<label>作業 <input type="number" id="work-min" value="25" min="1" max="60">分</label>
+<label>休憩 <input type="number" id="break-min" value="5"  min="1" max="30">分</label>
+</div>
+<div id="timer-display">25:00</div>
+<div id="progress-wrap"><div id="progress-bar"></div></div>
+<button id="start-btn">スタート</button>
+<button id="pause-btn">一時停止</button>
+<button id="reset-btn">リセット</button>
+</section>
+</div>
+<script>
+/* ========== ToDo ロジック ========== */
+let todos = JSON.parse(localStorage.getItem("todos")||"[]");
+let currentFilter = localStorage.getItem("filter")||"all";
+const todoInput   = document.getElementById("todo-input");
+const prioritySel = document.getElementById("priority-select");
+const listEl      = document.getElementById("todo-list");
+document.getElementById("add-btn").onclick = addTodo;
+document.querySelectorAll(".filter-group button").forEach(btn=>{
+ btn.onclick = ()=>{currentFilter=btn.dataset.filter;localStorage.setItem("filter",currentFilter);render();}
+});
+function addTodo(){
+ const text = todoInput.value.trim();
+ if(!text) return;
+ todos.push({text,priority:prioritySel.value,done:false});
+ todoInput.value="";save();render();
+}
+function toggle(idx){todos[idx].done=!todos[idx].done;save();render();}
+function del(idx){todos.splice(idx,1);save();render();}
+function editText(idx,span){
+ const val=todos[idx].text;
+ const input=document.createElement("input");
+ input.value=val;
+ input.onblur=()=>{todos[idx].text=input.value.trim()||val;save();render();}
+ span.replaceWith(input);input.focus();
+}
+function cyclePriority(p){return p==="low"?"medium":p==="medium"?"high":"low";}
+function changePrio(idx){todos[idx].priority=cyclePriority(todos[idx].priority);save();render();}
+function render(){
+ listEl.innerHTML="";
+ todos
+   .filter(t=>currentFilter==="all"||t.done=== (currentFilter==="done"))
+   .forEach((t,i)=>{
+     const li=document.createElement("li");
+     if(t.done) li.classList.add("completed");
+     li.innerHTML=`
+<div class="task">
+<input type="checkbox" ${t.done?"checked":""}/>
+<span class="priority-dot priority-${t.priority}" title="クリックで変更"></span>
+<span class="text">${t.text}</span>
+</div>
+<button>削除</button>`;
+     li.querySelector("input").onclick=()=>toggle(i);
+     li.querySelector("button").onclick=()=>del(i);
+     li.querySelector(".priority-dot").onclick=()=>changePrio(i);
+     li.querySelector(".text").ondblclick=()=>editText(i,li.querySelector(".text"));
+     listEl.appendChild(li);
+   });
+}
+function save(){localStorage.setItem("todos",JSON.stringify(todos));}
+render();
+/* ========== タイマー ロジック ========== */
+const workInput  = document.getElementById("work-min");
+const breakInput = document.getElementById("break-min");
+const display    = document.getElementById("timer-display");
+const progress   = document.getElementById("progress-bar");
+let isWork=true, timer=null, totalSec=1500, leftSec=1500;
+function updateDisplay(){
+ const m=String(Math.floor(leftSec/60)).padStart(2,"0");
+ const s=String(leftSec%60).padStart(2,"0");
+ display.textContent=`${m}:${s}`;
+ progress.style.width=`${(1-leftSec/totalSec)*100}%`;
+}
+function flashScreen(){
+ document.body.classList.add("flash");
+ setTimeout(()=>document.body.classList.remove("flash"),1200);
+}
+function start(){
+ if(timer) return;
+ timer=setInterval(()=>{
+   leftSec--;updateDisplay();
+   if(leftSec<=0){switchMode();}
+ },1000);
+}
+function pause(){clearInterval(timer);timer=null;}
+function reset(){
+ pause();isWork=true;
+ totalSec=leftSec=workInput.value*60;updateDisplay();
+}
+function switchMode(){
+ pause();
+ flashScreen();                      // ★ 画面点滅
+ isWork=!isWork;
+ totalSec=leftSec=(isWork?workInput.value:breakInput.value)*60;
+ alert(isWork?"作業時間です！":"休憩しましょう！");
+ updateDisplay();start();
+}
+document.getElementById("start-btn").onclick=start;
+document.getElementById("pause-btn").onclick=pause;
+document.getElementById("reset-btn").onclick=reset;
+workInput.onchange=breakInput.onchange=reset;
+reset(); /* 初期化 */
+</script>
 </body>
 </html>
