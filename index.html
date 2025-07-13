@@ -1,57 +1,62 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>ToDo + ポモドーロ</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ToDo + ポモドーロ</title>
+<!-- 外部CSS -->
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>ToDo + ポモドーロ <button id="theme-toggle" title="テーマ切替">🌙</button></h1>
-  <div class="container">
-    <!-- ===== ToDo ===== -->
-    <section id="todo-card">
-      <h2>📝 ToDoリスト</h2>
-      <div style="display:flex;flex-wrap:wrap;gap:.5rem">
-        <input type="text"  id="todo-input"  placeholder="やること..." style="flex:1 1 160px;">
-        <input type="date"  id="date-input"  style="flex:0 0 150px;">
-        <select id="priority-select">
-          <option value="low">低</option>
-          <option value="mid" selected>中</option>
-          <option value="hi">高</option>
-        </select>
-        <button id="add-btn">追加</button>
-      </div>
-      <div class="filter-group">
-        <button data-filter="all">すべて</button>
-        <button data-filter="active">未完了</button>
-        <button data-filter="done">完了</button>
-        <div class="sort-wrapper">
-          <button id="sort-btn">並び替え ▼</button>
-          <div id="sort-menu">
-            <button data-sort="prio">優先度（高→低）</button>
-            <button data-sort="due">締切が近い順</button>
-            <button data-sort="orig">登録順に戻す</button>
-          </div>
-        </div>
-      </div>
-      <ul id="todo-list"></ul>
-    </section>
-
-    <!-- ===== Timer ===== -->
-    <section id="timer-card">
-      <h2>⏱ ポモドーロタイマー</h2>
-      <div class="time-inputs">
-        <label>作業 <input type="number" id="work-min" value="25" min="1" max="60">分</label>
-        <label>休憩 <input type="number" id="break-min" value="5"  min="1" max="30">分</label>
-      </div>
-      <div id="timer-display">25:00</div>
-      <div id="progress-wrap"><div id="progress-bar"></div></div>
-      <button id="start-btn">スタート</button>
-      <button id="pause-btn">一時停止</button>
-      <button id="reset-btn">リセット</button>
-    </section>
-  </div>
-
-  <script src="script.js"></script>
+<h1>ToDo + ポモドーロ
+<button id="theme-toggle" title="テーマ切替">🌙</button>
+</h1>
+<div class="container">
+<!-- === ToDoリストセクション === -->
+<section id="todo-card">
+<h2>📝 ToDoリスト</h2>
+<div class="input-row">
+<input type="text" id="todo-input" placeholder="やること..." />
+<input type="date" id="date-input" />
+<select id="priority-select">
+<option value="low">低</option>
+<option value="mid" selected>中</option>
+<option value="hi">高</option>
+</select>
+<button id="add-btn">追加</button>
+</div>
+<div class="filter-group">
+<button data-filter="all">すべて</button>
+<button data-filter="active">未完了</button>
+<button data-filter="done">完了</button>
+<div class="sort-wrapper">
+<button id="sort-btn">並び替え ▼</button>
+<div id="sort-menu">
+<button data-sort="prio">優先度（高→低）</button>
+<button data-sort="due">締切が近い順</button>
+<button data-sort="orig">登録順に戻す</button>
+</div>
+</div>
+</div>
+<ul id="todo-list"></ul>
+<button id="clear-btn">すべて削除</button>
+</section>
+<!-- === タイマーセクション === -->
+<section id="timer-card">
+<h2>⏱ ポモドーロタイマー</h2>
+<div class="time-inputs">
+<label>作業 <input type="number" id="work-min" value="25" min="1" max="60" />分</label>
+<label>休憩 <input type="number" id="break-min" value="5" min="1" max="30" />分</label>
+</div>
+<div id="timer-display">25:00</div>
+<div id="progress-wrap"><div id="progress-bar"></div></div>
+<button id="start-btn">スタート</button>
+<button id="pause-btn">一時停止</button>
+<button id="reset-btn">リセット</button>
+</section>
+</div>
+<!-- 外部JavaScript -->
+<script src="script.js"></script>
 </body>
 </html>
+ 
