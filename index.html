@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>ToDo & ポモドーロタイマー</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #fdf6e3;
+      margin: 0;
+      padding: 30px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #2a2a2a;
+    }
+
+    #todo-section, #timer-section {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 500px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    input[type="text"] {
+      padding: 8px;
+      width: 70%;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 8px 16px;
+      margin: 5px;
+      font-size: 14px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      padding: 8px;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #eee;
+    }
+
+    .completed {
+      text-decoration: line-through;
+      color: gray;
+    }
+
+    #timer-display {
+      font-size: 48px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>ToDo + ポモドーロ</h1>
+
+  <div id="todo-section">
+    <h2>📝 ToDoリスト</h2>
+    <input type="text" id="todo-input" placeholder="やることを入力..." />
+    <button onclick="addTodo()">追加</button>
+    <ul id="todo-list"></ul>
+  </div>
+
+  <div id="timer-section">
+    <h2>⏱ ポモドーロタイマー</h2>
+    <div id="timer-display">25:00</div>
+    <button onclick="startTimer()">スタート</button>
+    <button onclick="pauseTimer()">一時停止</button>
+    <button onclick="resetTimer()">リセット</button>
+  </div>
+
+  <script>
+    // ToDoリストの処理
+    function addTodo() {
+      const input = document.getElementById('todo-input');
+      const text = input.value.trim();
+      if (text === '') return;
+
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <span onclick="toggleComplete(this)">${text}</span>
+        <button onclick="this.parentElement.remove()">削除</button>
+      `;
+      document.getElementById('todo-list').appendChild(li);
+      input.value = '';
+    }
+
+    function toggleComplete(el) {
+      el.classList.toggle('completed');
+    }
+
+    // タイマーの処理
+    let isWorkTime = true; // 作業 or 休憩
+    let timeLeft = 25 * 60; // 秒数
+    let timerId = null;
+
+    function updateDisplay() {
+      const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+      const seconds = (timeLeft % 60).toString().padStart(2, '0');
+      document.getElementById('timer-display').textContent = `${minutes}:${seconds}`;
+    }
+
+    function startTimer() {
+      if (timerId) return; // すでに動いてる
+      timerId = setInterval(() => {
+        timeLeft--;
+        updateDisplay();
+
+        if (timeLeft <= 0) {
+          clearInterval(timerId);
+          timerId = null;
+          isWorkTime = !isWorkTime;
+          timeLeft = isWorkTime ? 25 * 60 : 5 * 60;
+          alert(isWorkTime ? "作業時間です！" : "休憩しましょう！");
+          updateDisplay();
+          startTimer();
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      clearInterval(timerId);
+      timerId = null;
+    }
+
+    function resetTimer() {
+      clearInterval(timerId);
+      timerId = null;
+      isWorkTime = true;
+      timeLeft = 25 * 60;
+      updateDisplay();
+    }
+
+    // 初期表示
+    updateDisplay();
+  </script>
+
+</body>
+</html>
