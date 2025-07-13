@@ -71,6 +71,7 @@ section {
 /* ===== 共通入力 ===== */
 input[type="text"],
 input[type="number"],
+input[type="date"],
 select,
 button {
   padding: .5rem .75rem;
@@ -117,19 +118,33 @@ li:last-child { border-bottom: none; }
   border-radius: 50%;
   flex: 0 0 .8rem;
 }
-.priority-low { background: var(--priority-low); }
-.priority-medium { background: var(--priority-medium); }
-.priority-high { background: var(--priority-high); }
+.priority-low {
+  background: var(--priority-low);
+}
+.priority-mid {
+  background: var(--priority-medium);
+}
+.priority-hi {
+  background: var(--priority-high);
+}
 
 .priority-label {
   font-size: .85rem;
   font-weight: bold;
 }
-.priority-low + .priority-label { color: var(--priority-low); }
-.priority-medium + .priority-label { color: var(--priority-medium); }
-.priority-high + .priority-label { color: var(--priority-high); }
+.priority-low + .priority-label {
+  color: var(--priority-low);
+}
+.priority-mid + .priority-label {
+  color: var(--priority-medium);
+}
+.priority-hi + .priority-label {
+  color: var(--priority-high);
+}
 
-.completed .text { text-decoration: line-through; }
+.completed .text {
+  text-decoration: line-through;
+}
 
 .priority-dot:hover {
   outline: 2px dashed #999;
