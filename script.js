@@ -79,17 +79,20 @@ function changePrio(idx) {
 
 function render() {
   listEl.innerHTML = "";
-  todos
-    .filter(
-      (t) => currentFilter === "all" || t.done === (currentFilter === "done")
-    )
-    .forEach((t, i) => {
-      const li = document.createElement("li");
-      if (t.done) li.classList.add("completed");
-      const prioLabel =
-        t.priority === "low" ? "低" : t.priority === "medium" ? "中" : "高";
 
-      li.innerHTML = `
+  todos.forEach((t, i) => {
+    // フィルター処理をここに移動（indexズレ防止）
+    if (currentFilter !== "all" && t.done !== (currentFilter === "done")) {
+      return;
+    }
+
+    const li = document.createElement("li");
+    if (t.done) li.classList.add("completed");
+
+    const prioLabel =
+      t.priority === "low" ? "低" : t.priority === "medium" ? "中" : "高";
+
+    li.innerHTML = `
 <div class="task">
   <input type="checkbox" ${t.done ? "checked" : ""}/>
   <span class="priority-dot priority-${t.priority}" title="クリックで変更"></span>
@@ -98,13 +101,14 @@ function render() {
 </div>
 <button>削除</button>`;
 
-      li.querySelector("input").onclick = () => toggle(i);
-      li.querySelector("button").onclick = () => del(i);
-      li.querySelector(".priority-dot").onclick = () => changePrio(i);
-      li.querySelector(".text").ondblclick = () =>
-        editText(i, li.querySelector(".text"));
-      listEl.appendChild(li);
-    });
+    li.querySelector("input").onclick = () => toggle(i);
+    li.querySelector("button").onclick = () => del(i);
+    li.querySelector(".priority-dot").onclick = () => changePrio(i);
+    li.querySelector(".text").ondblclick = () =>
+      editText(i, li.querySelector(".text"));
+
+    listEl.appendChild(li);
+  });
 }
 
 function save() {
