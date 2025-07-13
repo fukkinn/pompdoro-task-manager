@@ -21,20 +21,20 @@
       border-radius: 8px;
       padding: 20px;
       margin: 20px auto;
-      max-width: 500px;
+      max-width: 600px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
-    input[type="text"] {
+    input[type="text"], select {
       padding: 8px;
-      width: 70%;
       font-size: 16px;
+      margin-right: 8px;
     }
 
     button {
       padding: 8px 16px;
-      margin: 5px;
       font-size: 14px;
+      margin: 5px;
     }
 
     ul {
@@ -43,16 +43,28 @@
     }
 
     li {
-      padding: 8px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       border-bottom: 1px solid #eee;
+      padding: 10px;
     }
 
-    .completed {
+    .completed .task-text {
       text-decoration: line-through;
       color: gray;
+    }
+
+    .priority-low {
+      color: green;
+    }
+
+    .priority-medium {
+      color: orange;
+    }
+
+    .priority-high {
+      color: red;
     }
 
     #timer-display {
@@ -60,10 +72,10 @@
       margin: 20px 0;
     }
 
-    span.task-text {
-      flex-grow: 1;
-      text-align: left;
-      cursor: pointer;
+    .left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
   </style>
 </head>
@@ -74,6 +86,11 @@
   <div id="todo-section">
     <h2>📝 ToDoリスト</h2>
     <input type="text" id="todo-input" placeholder="やることを入力..." />
+    <select id="priority-select">
+      <option value="low">低</option>
+      <option value="medium" selected>中</option>
+      <option value="high">高</option>
+    </select>
     <button onclick="addTodo()">追加</button>
     <ul id="todo-list"></ul>
   </div>
@@ -103,10 +120,11 @@
 
     function addTodo() {
       const input = document.getElementById('todo-input');
+      const priority = document.getElementById('priority-select').value;
       const text = input.value.trim();
       if (text === '') return;
 
-      todos.push({ text: text, completed: false });
+      todos.push({ text: text, completed: false, priority: priority });
       input.value = '';
       saveTodos();
       renderTodos();
@@ -129,23 +147,34 @@
       list.innerHTML = '';
       todos.forEach((todo, index) => {
         const li = document.createElement('li');
+        if (todo.completed) li.classList.add('completed');
+
+        const leftDiv = document.createElement('div');
+        leftDiv.className = 'left';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = todo.completed;
+        checkbox.onchange = () => toggleComplete(index);
+
         const span = document.createElement('span');
         span.textContent = todo.text;
-        span.className = 'task-text';
-        if (todo.completed) span.classList.add('completed');
-        span.onclick = () => toggleComplete(index);
+        span.className = `task-text priority-${todo.priority}`;
 
-        const del = document.createElement('button');
-        del.textContent = '削除';
-        del.onclick = () => deleteTodo(index);
+        leftDiv.appendChild(checkbox);
+        leftDiv.appendChild(span);
 
-        li.appendChild(span);
-        li.appendChild(del);
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '削除';
+        delBtn.onclick = () => deleteTodo(index);
+
+        li.appendChild(leftDiv);
+        li.appendChild(delBtn);
         list.appendChild(li);
       });
     }
 
-    // タイマー機能
+    // タイマー
     let isWorkTime = true;
     let timeLeft = 25 * 60;
     let timerId = null;
@@ -187,7 +216,7 @@
       updateDisplay();
     }
 
-    // 初期化
+    // 初期表示
     updateDisplay();
     loadTodos();
   </script>
